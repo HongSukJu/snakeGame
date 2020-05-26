@@ -1,5 +1,12 @@
+#include <iostream>
 #include "snakeGame.h"
 using namespace std;
+
+// milliSecond단위로 코드를 sleep해줌.
+void delay (unsigned int msecs) {
+	clock_t goal = msecs*CLOCKS_PER_SEC/1000 + clock();
+	while ( goal > clock() );
+}
 
 SnakeGame::SnakeGame() {
     height = 20; width = 80;
@@ -10,13 +17,16 @@ SnakeGame::SnakeGame() {
     drawSnake();
 }
 SnakeGame::~SnakeGame() {
+    nodelay(stdscr, false);
     getch();
     endwin();
 }
 void SnakeGame::initWindow() {
     initscr();
-    noecho();
-    curs_set(0);
+    noecho(); // 유저의 입력이 화면 커서에 나타나지 않게함.
+    keypad(stdscr, true); // 방향키의 입력이 가능하게함.
+    nodelay(stdscr, true); // getch()가 화면을 멈추지않게함.
+    curs_set(0); // 커서 안보이게 함.
 
     start_color();
     init_pair(1, COLOR_BLACK, COLOR_BLACK); // 배경 색깔
@@ -61,7 +71,23 @@ void SnakeGame::drawSnake() {
     }
     attroff(COLOR_PAIR(3));
 }
-void SnakeGame::moveSnake() {\
+void SnakeGame::moveSnake() {
+    int keyPressed = getch();
+    switch (keyPressed) {
+    case KEY_UP:
+        if (snake.direction != 2) snake.direction = 0;
+        break;
+    case KEY_RIGHT:
+        if (snake.direction != 3) snake.direction = 1;
+        break;
+    case KEY_DOWN:
+        if (snake.direction != 0) snake.direction = 2;
+        break;
+    case KEY_LEFT:
+        if (snake.direction != 1) snake.direction = 3;
+        break;
+    }
+
     attron(COLOR_PAIR(1));
     move(snake.tail[snake.length - 2].y, snake.tail[snake.length - 2].x);
     addch(' ');
@@ -79,7 +105,7 @@ void SnakeGame::moveSnake() {\
         break;
     case 2:
         snake.tail.insert(snake.tail.begin(), snake.head);
-        snake.head = Position(snake.head.y - 1, snake.head.x);
+        snake.head = Position(snake.head.y + 1, snake.head.x);
         break;
     case 3:
         snake.tail.insert(snake.tail.begin(), snake.head);
@@ -92,11 +118,25 @@ void SnakeGame::moveSnake() {\
     addch(' ');
     attroff(COLOR_PAIR(3));
 }
+bool SnakeGame::checkCollision() {
+    // head가 벽에 닿았는지 체크
+    if (snake.head.y == 0 || snake.head.x == 0 || snake.head.y == height || snake.head.x == width) {
+        return true;
+    }
+    // head가 body와 닿았는지 체크
+    for (int i=0; i<snake.tail.size(); i++) {
+        if (snake.head.y == snake.tail[i].y && snake.head.x == snake.tail[i].x) {
+            return true;
+        }
+    }
+    return false;
+}
 void SnakeGame::start() {
     while(true) {
+        if (checkCollision()) break;
         moveSnake();
         refresh();
 
-        getch();
+        delay(50);
     }
 }

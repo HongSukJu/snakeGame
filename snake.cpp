@@ -21,11 +21,3 @@ Snake::Snake(vector<Position> body) {
     length = body.size();
     direction = 3;
 };
-bool Snake::isTwisted() {
-    for (int i=0; i<tail.size(); i++) {
-        if (head.y == tail[i].y && head.x == tail[i].x) {
-            return true;
-        }
-    }
-    return false;
-}

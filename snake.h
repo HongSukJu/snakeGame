@@ -8,16 +8,14 @@ struct Position {
     Position(int col, int row);
 };
 
-class Snake {
-public:
-    int length, direction;
+struct Snake {
+    int length;
+    int direction; // direction의 기준은 시계방향, 즉 0이 위, 1이 오른쪽, 2는 아래, 3은 왼쪽.
     Position head;
     std::vector<Position> tail;
 
     Snake();
     Snake(std::vector<Position> body);
-    // head와 body가 겹치는지 알려줌.
-    bool isTwisted();
 };
 
 #endif
