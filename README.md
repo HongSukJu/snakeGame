@@ -9,6 +9,6 @@ C++ Programming Team Assignment
 <https://github.com/romanedgn/snake-game>
 ## How to execute
 ```
-g++ -o game main.cpp snake.cpp snakeGame.cpp -lncurses
+make
 ./game
 ```
