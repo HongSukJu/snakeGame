@@ -217,7 +217,7 @@ void SnakeGame::start() {
 
     while(true) {
         if (checkCollision()) break;
-				if (GI.size() < 3) makeGrowthItem();
+	if (GI.size() < 3) makeGrowthItem();
         moveSnake();
         refresh();
 
