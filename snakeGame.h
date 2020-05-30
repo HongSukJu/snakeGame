@@ -7,6 +7,7 @@
 class SnakeGame {
 private:
     int height, width;
+    std::vector<Position> GI;
     Snake snake;
 
     // window생성과 각종 필요한 설정을 해줌.
@@ -22,6 +23,9 @@ private:
     // 충돌했는지 아닌지 판별해줌.
     // 충돌했다면 return true, 아니라면 return false.
     bool checkCollision();
+    // GrowthItem 만들기.
+    void makeGrowthItem();
+    
 public:
     SnakeGame();
     ~SnakeGame();
