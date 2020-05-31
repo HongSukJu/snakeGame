@@ -193,16 +193,15 @@ void SnakeGame::makeGrowthItem() {
 	    Gy = rand() % (height - 2) + 1;
 	    Gx = rand() % (width - 2) + 1;
 	    for (int i = 0; i < snake.length; i ++) {
-		if (i == 0) {
-		    if (snake.head.y == Gy && snake.head.x == Gx) continue;
-		}
-		else {
-		    if (snake.tail[i].y == Gy && snake.tail[i].x == Gx) continue;
-		}
+		    if (i == 0) {
+		        if (snake.head.y == Gy && snake.head.x == Gx) continue;
+		    } else {
+		        if (snake.tail[i].y == Gy && snake.tail[i].x == Gx) continue;
+		    }
 	    }
-	Position temp = Position(Gy, Gx);
-	GI.push_back(temp);
-	break;
+	    Position temp = Position(Gy, Gx);
+	    GI.push_back(temp);
+	    break;
 	}
 	//그 위치에다가 아이템 그려주기
 	attron(COLOR_PAIR(4));
@@ -214,14 +213,15 @@ void SnakeGame::makeGrowthItem() {
 
 
 void SnakeGame::start() {
-
     while(true) {
-        if (checkCollision()) break;
-	if (GI.size() < 3) makeGrowthItem();
+        if (checkCollision()) {
+            break;
+        }
+        if (GI.size() < 3) {
+            makeGrowthItem();
+        }
         moveSnake();
         refresh();
-
         delay(50);
     }
 }
-
