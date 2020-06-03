@@ -8,6 +8,7 @@ class SnakeGame {
 private:
     int height, width;
     std::vector<Position> GI;
+    std::vector<Position> immuneWall;
     Snake snake;
 
     // window생성과 각종 필요한 설정을 해줌.

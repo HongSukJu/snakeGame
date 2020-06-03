@@ -32,10 +32,11 @@ void SnakeGame::initWindow() {
     curs_set(0); // 커서 안보이게 함.
 
     start_color();
-    init_pair(1, COLOR_BLACK, COLOR_BLACK); // 배경 색깔
-    init_pair(2, COLOR_WHITE, COLOR_WHITE); // 벽 색깔
-    init_pair(3, COLOR_MAGENTA, COLOR_MAGENTA); // 유저 색깔
-		init_pair(4, COLOR_GREEN, COLOR_GREEN); // GrowthItem 색깔
+    init_pair(1, COLOR_BLACK, COLOR_BLACK); // background color
+    init_pair(2, COLOR_WHITE, COLOR_WHITE); // wall color
+    init_pair(3, COLOR_MAGENTA, COLOR_MAGENTA); // user color
+	init_pair(4, COLOR_GREEN, COLOR_GREEN); // GrowthItem color
+    init_pair(5, 240, 240); // immune wall color
 }
 void SnakeGame::drawWall() {
     attron(COLOR_PAIR(2));
@@ -56,6 +57,18 @@ void SnakeGame::drawWall() {
         addch(' ');
     }
     attroff(COLOR_PAIR(2));
+
+    immuneWall.push_back(Position(0, 0));
+    immuneWall.push_back(Position(height - 1, 0));
+    immuneWall.push_back(Position(0, width - 1));
+    immuneWall.push_back(Position(height - 1, width - 1));
+
+    attron(COLOR_PAIR(5));
+    for (int i=0; i<4; i++) {
+        move(immuneWall[i].y, immuneWall[i].x);
+        addch(' ');
+    }
+    attron(COLOR_PAIR(5));
 }
 void SnakeGame::initSnake() {
     vector<Position> body;
