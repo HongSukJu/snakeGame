@@ -35,7 +35,8 @@ void SnakeGame::initWindow() {
     init_pair(1, COLOR_BLACK, COLOR_BLACK); // 배경 색깔
     init_pair(2, COLOR_WHITE, COLOR_WHITE); // 벽 색깔
     init_pair(3, COLOR_MAGENTA, COLOR_MAGENTA); // 유저 색깔
-		init_pair(4, COLOR_GREEN, COLOR_GREEN); // GrowthItem 색깔
+    init_pair(4, COLOR_GREEN, COLOR_GREEN); // GrowthItem 색깔
+    init_pair(5, COLOR_RED, COLOR_RED); // PosionItem 색깔
 }
 void SnakeGame::drawWall() {
     attron(COLOR_PAIR(2));
@@ -57,6 +58,7 @@ void SnakeGame::drawWall() {
     }
     attroff(COLOR_PAIR(2));
 }
+
 void SnakeGame::initSnake() {
     vector<Position> body;
     for (int i=0; i<3; i++) {
@@ -65,6 +67,7 @@ void SnakeGame::initSnake() {
     }
     snake = Snake(body);
 }
+
 void SnakeGame::drawSnake() {
     attron(COLOR_PAIR(3));
     move(snake.head.y, snake.head.x);
@@ -76,11 +79,22 @@ void SnakeGame::drawSnake() {
     attroff(COLOR_PAIR(3));
 }
 
-bool SnakeGame::isEat() {
+bool SnakeGame::isEatGrowth() {
     vector<Position>::iterator iter;
-    for (iter = growthItem.begin(); iter < growthItem.end(); ++iter) {
+    for (iter = growthItems.begin(); iter < growthItems.end(); ++iter) {
         if (iter->y == snake.head.y && iter->x == snake.head.x) {
-            iter = growthItem.erase(iter);
+            iter = growthItems.erase(iter);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SnakeGame::isEatPoison() {
+    vector<Position>::iterator iter;
+    for (iter = poisonItems.begin(); iter < poisonItems.end(); ++iter) {
+        if (iter->y == snake.head.y && iter->x == snake.head.x) {
+            iter = poisonItems.erase(iter);
             return true;
         }
     }
@@ -104,7 +118,8 @@ void SnakeGame::moveSnake() {
         break;
     }
 
-    if (!isEat()) {
+    // 둘다 안먹었을때.
+    if (!isEatGrowth() && !isEatPoison()) {
         attron(COLOR_PAIR(1));
         move(snake.tail[snake.tail.size() - 1].y, snake.tail[snake.tail.size() - 1].x);
         addch(' ');
@@ -136,6 +151,14 @@ void SnakeGame::moveSnake() {
     addch(' ');
     attroff(COLOR_PAIR(3));
 
+    // 움직이고 나서 독템을 먹었을때 꼬리 자르기
+    if (isEatPoison()) {
+        attron(COLOR_PAIR(1));
+        move(snake.tail[snake.tail.size() - 1].y, snake.tail[snake.tail.size() - 1].x);
+        addch(' ');
+        snake.tail.pop_back();
+        attroff(COLOR_PAIR(1));
+    }
 }
 bool SnakeGame::checkCollision() {
     // head가 벽에 닿았는지 체크
@@ -151,9 +174,9 @@ bool SnakeGame::checkCollision() {
     return false;
 }
 
-void SnakeGame::makeGrowthItem() {
+void SnakeGame::makeItems() {
     //아이템이 나타날 위치 임의로 선정
-    int Gy, Gx, cnt;
+    int Gy, Gx;
 
     while (true) {
         Gy = rand() % (height - 2) + 1;
@@ -166,27 +189,39 @@ void SnakeGame::makeGrowthItem() {
                 if (snake.tail[i].y == Gy && snake.tail[i].x == Gx) continue;
             }
         }
-        Position temp = Position(Gy, Gx);
-        growthItem.push_back(temp);
         break;
     }
+
+    Position temp = Position(Gy, Gx);
     //그 위치에다가 아이템 그려주기
-    attron(COLOR_PAIR(4));
-    move(Gy, Gx);
-    addch(' ');
-    attroff(COLOR_PAIR(4));
-    // 더해야될것 : 시간을 두고 나타나게, 몇초 지나면 사라지게.
+    int growthOrPoison = rand() % 2;     // 0이면 GrowthItem 만들고, 1이면 PoisonItem 만들기
+    if (growthOrPoison % 2 == 0) {
+        growthItems.push_back(temp);
+        attron(COLOR_PAIR(4));
+	move(Gy, Gx);
+	addch(' ');
+	attroff(COLOR_PAIR(4));
+    }
+    else {
+        poisonItems.push_back(temp);
+        attron(COLOR_PAIR(5));
+        move(Gy, Gx);
+	addch(' ');
+	attroff(COLOR_PAIR(5));
+    }
+    // 더해야될것 : 몇초 지나면 사라지게.
 }
 
 
 void SnakeGame::start() {
 
     while(true) {
+	if (snake.tail.size() < 2) break;
         if (checkCollision()) break;
-        if (growthItem.size() < 3) makeGrowthItem();
+	if (growthItems.size() + poisonItems.size() < 3) makeItems();
         moveSnake();
         refresh();
 
-        delay(50);
+        delay(60);
     }
 }
