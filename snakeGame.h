@@ -7,7 +7,8 @@
 class SnakeGame {
 private:
     int height, width;
-    std::vector<Position> growthItem;
+    std::vector<Position> growthItems;
+    std::vector<Position> poisonItems;
     std::vector<Position> immuneWall;
     Snake snake;
 
@@ -27,7 +28,9 @@ private:
     // GrowthItem 만들기.
     void makeGrowthItem();
     // GrowthItem 먹었는지 아닌지 판별하기.
-    bool isEat();
+    bool isEatGrowth();
+    // PoisonItem 먹었는지 아닌지 판별하기.
+    bool isEatPoison();
     
 public:
     SnakeGame();
