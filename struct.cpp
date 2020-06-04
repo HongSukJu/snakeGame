@@ -1,4 +1,4 @@
-#include "snake.h"
+#include "struct.h"
 using namespace std;
 
 Position::Position() {
@@ -21,3 +21,16 @@ Snake::Snake(vector<Position> body) {
     length = body.size();
     direction = 3;
 };
+
+Wall::Wall() {
+    pos = Position();
+    immune = false;
+    gate = false;
+    destination = NULL;
+}
+Wall::Wall(int y, int x, bool immune) {
+    pos = Position(y, x);
+    this->immune = immune;
+    gate= false;
+    destination = NULL;
+}

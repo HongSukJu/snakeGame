@@ -1,6 +1,6 @@
 #include <vector>
-#ifndef SNAKE_H
-#define SNAKE_H
+#ifndef STRUCT_H
+#define STRUCT_H
 
 struct Position {
     int y, x;
@@ -17,5 +17,16 @@ struct Snake {
     Snake();
     Snake(std::vector<Position> body);
 };
+
+struct Wall{
+    Position pos;
+    bool immune;
+    bool gate;
+    Wall* destination;
+
+    Wall();
+    Wall(int y, int x, bool immune=false);
+};
+
 
 #endif

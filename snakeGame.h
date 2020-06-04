@@ -1,6 +1,6 @@
 #include <ncurses.h>
 #include <vector>
-#include "snake.h"
+#include "struct.h"
 #ifndef SNAKEGAME_H
 #define SNAKEGAME_H
 
@@ -9,13 +9,15 @@ private:
     int height, width;
     std::vector<Position> growthItems;
     std::vector<Position> poisonItems;
-    std::vector<Position> immuneWall;
+    std::vector<Wall> walls;
     Snake snake;
 
     // window생성과 각종 필요한 설정을 해줌.
     void initWindow();
-    // 가장자리 벽을 그려줌.
-    void drawWall();
+    // wall을 초기화해줌.
+    void initWalls();
+    // 최초 wall을 그려줌.
+    void drawWalls();
     // snake를 초기화해줌.
     void initSnake();
     // 최초 snake를 그려줌.

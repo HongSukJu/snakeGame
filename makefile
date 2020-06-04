@@ -1,5 +1,5 @@
 CC = g++
-OBJS = main.o snake.o snakeGame.o
+OBJS = main.o struct.o snakeGame.o
 
 game: ${OBJS}
 	${CC} -o $@ ${OBJS} -lncurses
