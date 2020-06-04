@@ -216,11 +216,12 @@ void SnakeGame::makeItems() {
 void SnakeGame::start() {
 
     while(true) {
-	if (snake.tail.size() < 2) break;
+        if (snake.length < 2) break;
         if (checkCollision()) break;
-	if (growthItems.size() + poisonItems.size() < 3) makeItems();
-        moveSnake();
-        refresh();
+        
+        if (growthItems.size() + poisonItems.size() < 3) makeItems();
+            moveSnake();
+            refresh();
 
         delay(60);
     }

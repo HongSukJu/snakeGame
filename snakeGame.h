@@ -26,7 +26,7 @@ private:
     // 충돌했다면 return true, 아니라면 return false.
     bool checkCollision();
     // GrowthItem 만들기.
-    void makeGrowthItem();
+    void makeItems();
     // GrowthItem 먹었는지 아닌지 판별하기.
     bool isEatGrowth();
     // PoisonItem 먹었는지 아닌지 판별하기.
