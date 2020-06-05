@@ -214,16 +214,15 @@ void SnakeGame::makeItems() {
     if (growthOrPoison % 2 == 0) {
         growthItems.push_back(temp);
         attron(COLOR_PAIR(5));
-	move(Gy, Gx);
-	addch(' ');
-	attroff(COLOR_PAIR(5));
-    }
-    else {
+        move(Gy, Gx);
+        addch(' ');
+        attroff(COLOR_PAIR(5));
+    } else {
         poisonItems.push_back(temp);
         attron(COLOR_PAIR(6));
         move(Gy, Gx);
-	addch(' ');
-	attroff(COLOR_PAIR(6));
+        addch(' ');
+        attroff(COLOR_PAIR(6));
     }
     // 더해야될것 : 몇초 지나면 사라지게.
 }
