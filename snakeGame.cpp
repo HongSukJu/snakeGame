@@ -1,6 +1,5 @@
 #include <iostream>
 #include <ctime>
-#include <cstdlib>
 #include "snakeGame.h"
 using namespace std;
 
@@ -39,6 +38,8 @@ void SnakeGame::initWindow() {
     init_pair(4, COLOR_MAGENTA, COLOR_MAGENTA); // 유저 색깔
     init_pair(5, COLOR_GREEN, COLOR_GREEN); // GrowthItem 색깔
     init_pair(6, COLOR_RED, COLOR_RED); // PosionItem 색깔
+    init_pair(7, COLOR_BLUE, COLOR_BLUE); // gate department 색깔
+    init_pair(8, COLOR_CYAN, COLOR_CYAN); // gate destination 색깔
 }
 void SnakeGame::initWalls() {
     for (int i=0; i<width; i++) {
@@ -71,7 +72,6 @@ void SnakeGame::drawWalls() {
         }
     }
 }
-
 void SnakeGame::initSnake() {
     vector<Position> body;
     for (int i=0; i<3; i++) {
@@ -80,7 +80,6 @@ void SnakeGame::initSnake() {
     }
     snake = Snake(body);
 }
-
 void SnakeGame::drawSnake() {
     attron(COLOR_PAIR(4));
     move(snake.head.y, snake.head.x);
@@ -91,7 +90,6 @@ void SnakeGame::drawSnake() {
     }
     attroff(COLOR_PAIR(4));
 }
-
 bool SnakeGame::isEatGrowth() {
     vector<Position>::iterator iter;
     for (iter = growthItems.begin(); iter < growthItems.end(); ++iter) {
@@ -102,7 +100,6 @@ bool SnakeGame::isEatGrowth() {
     }
     return false;
 }
-
 bool SnakeGame::isEatPoison() {
     vector<Position>::iterator iter;
     for (iter = poisonItems.begin(); iter < poisonItems.end(); ++iter) {
@@ -113,7 +110,15 @@ bool SnakeGame::isEatPoison() {
     }
     return false;
 }
-
+// 포인터를 리턴한 이유로는 그냥 Wall을 리턴할경우 NULL이 리턴이안되네요 개같은.
+Wall* SnakeGame::isOnGate() {
+    auto iter = walls.begin();
+    for (; iter != walls.end(); iter++) {
+        if (iter->gate && iter->pos.y == snake.head.y && iter->pos.x == snake.head.x)
+            return iter->destination;
+    }
+    return NULL;
+}
 void SnakeGame::moveSnake() {
     int keyPressed = getch();
     switch (keyPressed) {
@@ -129,16 +134,6 @@ void SnakeGame::moveSnake() {
     case KEY_LEFT:
         if (snake.direction != 1) snake.direction = 3;
         break;
-    }
-
-    if (!isEatGrowth()) {
-        attron(COLOR_PAIR(1));
-        move(snake.tail[snake.tail.size() - 1].y, snake.tail[snake.tail.size() - 1].x);
-        addch(' ');
-        snake.tail.pop_back();
-        attroff(COLOR_PAIR(1));
-    } else {
-        snake.length++;
     }
 
     switch (snake.direction) {
@@ -159,12 +154,53 @@ void SnakeGame::moveSnake() {
         snake.head = Position(snake.head.y, snake.head.x - 1);
         break;
     }
+        
+    Wall* destination = isOnGate();
+
+    if (destination) {
+        // 게이트에 들어갔을때 움직임.
+        while (true) {
+            snake.head = Position(destination->pos.y, destination->pos.x);
+            switch (snake.direction) {
+            case 0:
+                snake.head = Position(snake.head.y - 1, snake.head.x);
+                break;
+            case 1:
+                snake.head = Position(snake.head.y, snake.head.x + 1);
+                break;
+            case 2:
+                snake.head = Position(snake.head.y + 1, snake.head.x);
+                break;
+            case 3:
+                snake.head = Position(snake.head.y, snake.head.x - 1);
+                break;
+            }
+
+            /*
+                게이트에서 자신의 방향으로 전진해보고, 아니다 싶으면
+                direction을 1더하고 4로 나눈뒤 다시 게이트에서 전진해봄.
+                이러면 ppt Game Rule에 부합함.
+            */
+            if (checkCollision()) {
+                snake.direction = (snake.direction + 1) % 4;
+            } else break; 
+        }
+    }
 
     attron(COLOR_PAIR(4));
     move(snake.head.y, snake.head.x);
     addch(' ');
     attroff(COLOR_PAIR(4));
 
+    if (!isEatGrowth() && !destination) {
+        attron(COLOR_PAIR(1));
+        move(snake.tail[snake.tail.size() - 1].y, snake.tail[snake.tail.size() - 1].x);
+        addch(' ');
+        snake.tail.pop_back();
+        attroff(COLOR_PAIR(1));
+    } else {
+        snake.length++;
+    }
     if (isEatPoison()) {
         attron(COLOR_PAIR(1));
         move(snake.tail[snake.tail.size() - 1].y, snake.tail[snake.tail.size() - 1].x);
@@ -175,9 +211,13 @@ void SnakeGame::moveSnake() {
     }
 }
 bool SnakeGame::checkCollision() {
+    // head가 벽밖으로 나갔는지 체크
+    if (snake.head.y < 0 || snake.head.y >= height || snake.head.x < 0 || snake.head.x >= width)
+        return true;
+
     // head가 벽에 닿았는지 체크
     for (int i=0; i<walls.size(); i++) {
-        if (snake.head.y == walls[i].pos.y && snake.head.x == walls[i].pos.x && !walls[i].gate) {
+        if (!walls[i].gate && snake.head.y == walls[i].pos.y && snake.head.x == walls[i].pos.x) {
             return true;
         }
     }
@@ -226,9 +266,30 @@ void SnakeGame::makeItems() {
     }
     // 더해야될것 : 몇초 지나면 사라지게.
 }
+void SnakeGame::makeGate() {
+    int idx = rand() % walls.size();
+    while (walls[idx].immune)
+        idx = rand() % walls.size();
 
+    int destinationIdx = rand() % walls.size();
+    while (walls[destinationIdx].immune || idx == destinationIdx)
+        destinationIdx = rand() % walls.size();
 
+    walls[idx].gate = true;
+    walls[idx].destination = &walls[destinationIdx];
+
+    attron(COLOR_PAIR(7));
+    move(walls[idx].pos.y, walls[idx].pos.x);
+    addch(' ');
+    attroff(COLOR_PAIR(7));
+
+    attron(COLOR_PAIR(8));
+    move(walls[destinationIdx].pos.y, walls[destinationIdx].pos.x);
+    addch(' ');
+    attroff(COLOR_PAIR(8));
+}
 void SnakeGame::start() {
+    makeGate();
 
     while(true) {
         if (snake.length < 3) break;
@@ -238,6 +299,6 @@ void SnakeGame::start() {
             moveSnake();
             refresh();
 
-        delay(60);
+        delay(100);
     }
 }

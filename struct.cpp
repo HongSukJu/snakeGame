@@ -31,6 +31,6 @@ Wall::Wall() {
 Wall::Wall(int y, int x, bool immune) {
     pos = Position(y, x);
     this->immune = immune;
-    gate= false;
+    gate = false;
     destination = NULL;
 }

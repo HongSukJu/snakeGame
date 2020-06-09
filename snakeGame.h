@@ -29,10 +29,14 @@ private:
     bool checkCollision();
     // GrowthItem 만들기.
     void makeItems();
+    // gate 만들기.
+    void makeGate();
     // GrowthItem 먹었는지 아닌지 판별하기.
     bool isEatGrowth();
     // PoisonItem 먹었는지 아닌지 판별하기.
     bool isEatPoison();
+    // gate 위에 있는지 아닌지 판별하기.
+    Wall* isOnGate();
     
 public:
     SnakeGame();
