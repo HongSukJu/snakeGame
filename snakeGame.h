@@ -8,11 +8,14 @@
 class SnakeGame {
 private:
     int height, width;
+    int score, boardHeight, boardWidth;
+    int level;
     std::vector<Position> growthItems;
     std::vector<Position> poisonItems;
     std::vector<Wall> walls;
     Snake snake;
     time_t item_start, item_curr;
+    WINDOW *scoreBoard;
 
     // window생성과 각종 필요한 설정을 해줌.
     void initWindow();
@@ -41,6 +44,8 @@ private:
     bool isEatPoison();
     // gate 위에 있는지 아닌지 판별하기.
     Wall* isOnGate();
+    // scoreBoard 새로고침.
+    void drawScoreBoard();
     
 public:
     SnakeGame();

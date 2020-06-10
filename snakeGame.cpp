@@ -11,7 +11,10 @@ void delay (unsigned int msecs) {
 }
 
 SnakeGame::SnakeGame():item_start(time(NULL)){
-    height = 20; width = 80;
+    height = 20; width = 50;
+    boardHeight = height; boardWidth = 25;
+    score = 0;
+    level = 1;
     srand((unsigned int)time(NULL));
 
     initWindow();
@@ -41,21 +44,24 @@ void SnakeGame::initWindow() {
     init_pair(6, COLOR_RED, COLOR_RED); // PosionItem 색깔
     init_pair(7, COLOR_BLUE, COLOR_BLUE); // gate department 색깔
     init_pair(8, COLOR_CYAN, COLOR_CYAN); // gate destination 색깔
+
+    scoreBoard = newwin(boardHeight, boardWidth, 1, width+2);
+    box(scoreBoard, 0, 0);
 }
 void SnakeGame::initWalls() {
-    for (int i=0; i<width; i++) {
-        if (i == 0 || i == width-1) walls.push_back(Wall(0, i, true));
-        else walls.push_back(Wall(0, i));
+    for (int i=1; i<=width; i++) {
+        if (i == 1 || i == width) walls.push_back(Wall(1, i, true));
+        else walls.push_back(Wall(1, i));
     }
-    for (int i=0; i<width; i++) {
-        if (i == 0 || i == width-1) walls.push_back(Wall(height-1, i, true));
-        else walls.push_back(Wall(height-1, i));
+    for (int i=1; i<=width; i++) {
+        if (i == 1 || i == width) walls.push_back(Wall(height, i, true));
+        else walls.push_back(Wall(height, i));
     }
-    for (int i=1; i<height-1; i++) {
-        walls.push_back(Wall(i, 0));
+    for (int i=2; i<height; i++) {
+        walls.push_back(Wall(i, 1));
     }
-    for (int i=1; i<height-1; i++) {
-        walls.push_back(Wall(i, width-1));
+    for (int i=2; i<height; i++) {
+        walls.push_back(Wall(i, width));
     }
 }
 void SnakeGame::drawWalls() {
@@ -213,7 +219,7 @@ void SnakeGame::moveSnake() {
 }
 bool SnakeGame::checkCollision() {
     // head가 벽밖으로 나갔는지 체크
-    if (snake.head.y < 0 || snake.head.y >= height || snake.head.x < 0 || snake.head.x >= width)
+    if (snake.head.y < 1 || snake.head.y > height || snake.head.x < 1 || snake.head.x > width)
         return true;
 
     // head가 벽에 닿았는지 체크
@@ -236,8 +242,8 @@ void SnakeGame::makeItems() {
     int Gy, Gx;
 
     while (true) {
-        Gy = rand() % (height - 2) + 1;
-        Gx = rand() % (width - 2) + 1;
+        Gy = rand() % (height - 2) + 2;
+        Gx = rand() % (width - 2) + 2;
         for (int i = 0; i < snake.length; i ++) {
             if (i == 0) {
                 if (snake.head.y == Gy && snake.head.x == Gx) continue;
@@ -310,6 +316,13 @@ void SnakeGame::makeGate() {
     addch(' ');
     attroff(COLOR_PAIR(8));
 }
+void SnakeGame::drawScoreBoard() {
+    mvwprintw(scoreBoard, 0, 1, "Score Board");
+    mvwprintw(scoreBoard, boardHeight/3, boardWidth/2 - 2, "level");
+    mvwprintw(scoreBoard, boardHeight/3+1, boardWidth/2, to_string(level).c_str());
+    mvwprintw(scoreBoard, boardHeight/3*2, boardWidth/2 - 2, "Score");
+    mvwprintw(scoreBoard, boardHeight/3*2+1, boardWidth/2, to_string(score).c_str());
+}
 void SnakeGame::start() {
     makeGate();
 
@@ -326,8 +339,10 @@ void SnakeGame::start() {
             removeItems();
             item_start = time(NULL); // 타이머 초기화
         }
-            moveSnake();
-            refresh();
+        moveSnake();
+        drawScoreBoard();
+        refresh();
+        wrefresh(scoreBoard);
 
         delay(100);
     }
