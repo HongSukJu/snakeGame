@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <time.h>
 #include "snakeGame.h"
 using namespace std;
 
@@ -9,7 +10,7 @@ void delay (unsigned int msecs) {
     while ( goal > clock() );
 }
 
-SnakeGame::SnakeGame() {
+SnakeGame::SnakeGame():item_start(time(NULL)){
     height = 20; width = 80;
     srand((unsigned int)time(NULL));
 
@@ -19,7 +20,7 @@ SnakeGame::SnakeGame() {
     initSnake();
     drawSnake();
 }
-SnakeGame::~SnakeGame() {
+SnakeGame::~SnakeGame(){
     nodelay(stdscr, false);
     getch();
     endwin();
@@ -266,6 +267,27 @@ void SnakeGame::makeItems() {
     }
     // 더해야될것 : 몇초 지나면 사라지게.
 }
+
+void SnakeGame::removeItems(){
+
+    vector<Position>::iterator iter;
+    for (iter = growthItems.begin(); iter < growthItems.end(); ++iter) { // GrowthItem에 있는 Position정보들 모두 배경색으로 칠하기.
+        attron(COLOR_PAIR(1));
+        move(iter->y, iter->x);
+        addch(' ');
+        attroff(COLOR_PAIR(1));
+    }
+    growthItems.clear(); // GrowthItem에 있는 Position 정보 초기화 
+
+    for (iter = poisonItems.begin(); iter < poisonItems.end(); ++iter) { // PoisonItem에 있는 Position정보들 모두 배경색으로 칠하기.
+        attron(COLOR_PAIR(1));
+        move(iter->y, iter->x);
+        addch(' ');
+        attroff(COLOR_PAIR(1));
+    }
+    poisonItems.clear(); // PoisonItem에 있는 Position 정보 초기화 
+}
+
 void SnakeGame::makeGate() {
     int idx = rand() % walls.size();
     while (walls[idx].immune)
@@ -294,8 +316,16 @@ void SnakeGame::start() {
     while(true) {
         if (snake.length < 3) break;
         if (checkCollision()) break;
-        
-        if (growthItems.size() + poisonItems.size() < 3) makeItems();
+
+        item_curr = time(NULL) - item_start; // 타이머 측정 
+        if (growthItems.size() + poisonItems.size() < 3){
+            makeItems();
+
+        }
+        if (item_curr > 5){ // item 생성시간이 5초를 초과하면 아이템 재생성  
+            removeItems();
+            item_start = time(NULL); // 타이머 초기화
+        }
             moveSnake();
             refresh();
 

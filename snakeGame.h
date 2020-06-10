@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include <vector>
 #include "struct.h"
+#include <time.h>
 #ifndef SNAKEGAME_H
 #define SNAKEGAME_H
 
@@ -11,6 +12,7 @@ private:
     std::vector<Position> poisonItems;
     std::vector<Wall> walls;
     Snake snake;
+    time_t item_start, item_curr;
 
     // window생성과 각종 필요한 설정을 해줌.
     void initWindow();
@@ -27,8 +29,10 @@ private:
     // 충돌했는지 아닌지 판별해줌.
     // 충돌했다면 return true, 아니라면 return false.
     bool checkCollision();
-    // GrowthItem 만들기.
+    // Item 만들기.
     void makeItems();
+    // Item 지우기.
+    void removeItems();
     // gate 만들기.
     void makeGate();
     // GrowthItem 먹었는지 아닌지 판별하기.
