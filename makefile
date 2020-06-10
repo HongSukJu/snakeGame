@@ -8,7 +8,7 @@ clean:
 	rm -f *.o
 
 %.o: %.cpp %.h
-	${CC} -c $<
+	${CC} -std=c++14 -c $<
 
 %.o: %.cpp
-	${CC} -c $<
+	${CC} -std=c++14 -c $<
