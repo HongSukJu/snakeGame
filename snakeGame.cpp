@@ -44,11 +44,11 @@ void SnakeGame::initWindow() {
 }
 void SnakeGame::initWalls() {
     for (int i=0; i<width; i++) {
-        if (i == 0 || i == width) walls.push_back(Wall(0, i, true));
+        if (i == 0 || i == width-1) walls.push_back(Wall(0, i, true));
         else walls.push_back(Wall(0, i));
     }
     for (int i=0; i<width; i++) {
-        if (i == 0 || i == width) walls.push_back(Wall(height-1, i, true));
+        if (i == 0 || i == width-1) walls.push_back(Wall(height-1, i, true));
         else walls.push_back(Wall(height-1, i));
     }
     for (int i=1; i<height-1; i++) {
