@@ -1,4 +1,6 @@
 #include "struct.h"
+#include <cstddef>
+#include <cstdlib>
 using namespace std;
 
 Position::Position() {
