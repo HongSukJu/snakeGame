@@ -239,20 +239,28 @@ bool SnakeGame::checkCollision() {
 
 void SnakeGame::makeItems() {
     //아이템이 나타날 위치 임의로 선정
+    bool check = false;
     int Gy, Gx;
 
-    while (true) {
+    while (!check) {
+        check = true;
         Gy = rand() % (height - 2) + 2;
         Gx = rand() % (width - 2) + 2;
+
         for (int i = 0; i < snake.length; i ++) {
             if (i == 0) {
-                if (snake.head.y == Gy && snake.head.x == Gx) continue;
+                if (snake.head.y == Gy && snake.head.x == Gx) {
+                    check = false;
+                    break;
+                }
             }
             else {
-                if (snake.tail[i].y == Gy && snake.tail[i].x == Gx) continue;
+                if (snake.tail[i].y == Gy && snake.tail[i].x == Gx) {
+                    check = false;
+                    break;
+                }
             }
         }
-        break;
     }
 
     Position temp = Position(Gy, Gx);
