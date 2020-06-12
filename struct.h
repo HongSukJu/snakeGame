@@ -11,6 +11,7 @@ struct Position {
 struct Snake {
     int length;
     int direction; // direction의 기준은 시계방향, 즉 0이 위, 1이 오른쪽, 2는 아래, 3은 왼쪽.
+    int maxLength, growthCnt, poisonCnt, gateCnt;
     Position head;
     std::vector<Position> tail;
 

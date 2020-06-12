@@ -13,6 +13,7 @@ void delay (unsigned int msecs) {
 SnakeGame::SnakeGame():item_start(time(NULL)){
     height = 21; width = 50;
     boardHeight = (height) / 2; boardWidth = 25;
+    score = 0;
     srand((unsigned int)time(NULL));
 
     initWindow();
@@ -101,6 +102,9 @@ bool SnakeGame::isEatGrowth() {
     for (iter = growthItems.begin(); iter < growthItems.end(); ++iter) {
         if (iter->y == snake.head.y && iter->x == snake.head.x) {
             iter = growthItems.erase(iter);
+            snake.growthCnt++;
+            snake.length++;
+            if (snake.maxLength < snake.length) snake.maxLength = snake.length;
             return true;
         }
     }
@@ -111,6 +115,8 @@ bool SnakeGame::isEatPoison() {
     for (iter = poisonItems.begin(); iter < poisonItems.end(); ++iter) {
         if (iter->y == snake.head.y && iter->x == snake.head.x) {
             iter = poisonItems.erase(iter);
+            snake.poisonCnt++;
+            snake.length--;
             return true;
         }
     }
@@ -120,8 +126,10 @@ bool SnakeGame::isEatPoison() {
 Wall* SnakeGame::isOnGate() {
     auto iter = walls.begin();
     for (; iter != walls.end(); iter++) {
-        if (iter->gate && iter->pos.y == snake.head.y && iter->pos.x == snake.head.x)
+        if (iter->gate && iter->pos.y == snake.head.y && iter->pos.x == snake.head.x) {
+            snake.gateCnt++;
             return iter->destination;
+        }
     }
     return NULL;
 }
@@ -204,8 +212,6 @@ void SnakeGame::moveSnake() {
         addch(' ');
         snake.tail.pop_back();
         attroff(COLOR_PAIR(1));
-    } else {
-        snake.length++;
     }
     if (isEatPoison()) {
         attron(COLOR_PAIR(1));
@@ -213,7 +219,6 @@ void SnakeGame::moveSnake() {
         addch(' ');
         snake.tail.pop_back();
         attroff(COLOR_PAIR(1));
-        snake.length--;
     }
 }
 bool SnakeGame::checkCollision() {
@@ -323,6 +328,20 @@ void SnakeGame::makeGate() {
     attroff(COLOR_PAIR(7));
 }
 void SnakeGame::drawScoreBoard() {
+    mvwprintw(scoreBoard, 0, 1, "Score Board");
+    mvwprintw(missionBoard, 0, 1, "Mission Board");
+    string B = "B: ";
+    B.append(to_string(snake.length)).append(" / ").append(to_string(snake.maxLength));
+    mvwprintw(scoreBoard, boardHeight/3, 2, B.c_str());
+    string plus = "+: ";
+    plus.append(to_string(snake.growthCnt));
+    mvwprintw(scoreBoard, boardHeight/3+1, 2, plus.c_str());
+    string minus = "-: ";
+    minus.append(to_string(snake.poisonCnt));
+    mvwprintw(scoreBoard, boardHeight/3+2, 2, minus.c_str());
+    string G = "G: ";
+    G.append(to_string(snake.gateCnt));
+    mvwprintw(scoreBoard, boardHeight/3+3, 2, G.c_str());
 }
 void SnakeGame::start() {
     makeGate();

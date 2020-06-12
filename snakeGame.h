@@ -9,6 +9,7 @@ class SnakeGame {
 private:
     int height, width;
     int boardHeight, boardWidth;
+    int score;
     std::vector<Position> growthItems;
     std::vector<Position> poisonItems;
     std::vector<Wall> walls;

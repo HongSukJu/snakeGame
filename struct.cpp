@@ -15,6 +15,8 @@ Position::Position(int col, int row) {
 Snake::Snake() {
     length = 0;
     direction = 0;
+    maxLength = 3;
+    growthCnt = 0; poisonCnt = 0; gateCnt = 0;
     head = Position();
 }
 Snake::Snake(vector<Position> body) {
@@ -22,6 +24,8 @@ Snake::Snake(vector<Position> body) {
     tail = vector<Position>(body.begin() + 1, body.end());
     length = body.size();
     direction = 3;
+    maxLength = 3;
+    growthCnt = 0; poisonCnt = 0; gateCnt = 0;
 };
 
 Wall::Wall() {
