@@ -312,17 +312,16 @@ void SnakeGame::makeGate() {
         destinationIdx = rand() % walls.size();
 
     walls[idx].gate = true;
+    walls[destinationIdx].gate = true;
     walls[idx].destination = &walls[destinationIdx];
+    walls[destinationIdx].destination = &walls[idx];
 
     attron(COLOR_PAIR(7));
     move(walls[idx].pos.y, walls[idx].pos.x);
     addch(' ');
-    attroff(COLOR_PAIR(7));
-
-    attron(COLOR_PAIR(8));
     move(walls[destinationIdx].pos.y, walls[destinationIdx].pos.x);
     addch(' ');
-    attroff(COLOR_PAIR(8));
+    attroff(COLOR_PAIR(7));
 }
 void SnakeGame::drawScoreBoard() {
     mvwprintw(scoreBoard, 0, 1, "Score Board");
