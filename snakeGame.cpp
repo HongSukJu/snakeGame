@@ -333,11 +333,11 @@ void SnakeGame::start() {
         item_curr = time(NULL) - item_start; // 타이머 측정 
         if (growthItems.size() + poisonItems.size() < 3){
             makeItems();
+            item_start = time(NULL); // 타이머 초기화
 
         }
         if (item_curr > 5){ // item 생성시간이 5초를 초과하면 아이템 재생성  
             removeItems();
-            item_start = time(NULL); // 타이머 초기화
         }
         moveSnake();
         drawScoreBoard();
