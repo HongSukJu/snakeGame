@@ -8,14 +8,14 @@
 class SnakeGame {
 private:
     int height, width;
-    int score, boardHeight, boardWidth;
-    int level;
+    int boardHeight, boardWidth;
     std::vector<Position> growthItems;
     std::vector<Position> poisonItems;
     std::vector<Wall> walls;
     Snake snake;
     time_t item_start, item_curr;
     WINDOW *scoreBoard;
+    WINDOW *missionBoard;
 
     // window생성과 각종 필요한 설정을 해줌.
     void initWindow();

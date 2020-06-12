@@ -11,10 +11,8 @@ void delay (unsigned int msecs) {
 }
 
 SnakeGame::SnakeGame():item_start(time(NULL)){
-    height = 20; width = 50;
-    boardHeight = height; boardWidth = 25;
-    score = 0;
-    level = 1;
+    height = 21; width = 50;
+    boardHeight = (height) / 2; boardWidth = 25;
     srand((unsigned int)time(NULL));
 
     initWindow();
@@ -43,10 +41,11 @@ void SnakeGame::initWindow() {
     init_pair(5, COLOR_GREEN, COLOR_GREEN); // GrowthItem 색깔
     init_pair(6, COLOR_RED, COLOR_RED); // PosionItem 색깔
     init_pair(7, COLOR_BLUE, COLOR_BLUE); // gate department 색깔
-    init_pair(8, COLOR_CYAN, COLOR_CYAN); // gate destination 색깔
 
     scoreBoard = newwin(boardHeight, boardWidth, 1, width+2);
+    missionBoard = newwin(boardHeight, boardWidth, 2+boardHeight, width+2);
     box(scoreBoard, 0, 0);
+    box(missionBoard, 0 ,0);
 }
 void SnakeGame::initWalls() {
     for (int i=1; i<=width; i++) {
@@ -324,11 +323,6 @@ void SnakeGame::makeGate() {
     attroff(COLOR_PAIR(7));
 }
 void SnakeGame::drawScoreBoard() {
-    mvwprintw(scoreBoard, 0, 1, "Score Board");
-    mvwprintw(scoreBoard, boardHeight/3, boardWidth/2 - 2, "level");
-    mvwprintw(scoreBoard, boardHeight/3+1, boardWidth/2, to_string(level).c_str());
-    mvwprintw(scoreBoard, boardHeight/3*2, boardWidth/2 - 2, "Score");
-    mvwprintw(scoreBoard, boardHeight/3*2+1, boardWidth/2, to_string(score).c_str());
 }
 void SnakeGame::start() {
     makeGate();
@@ -350,6 +344,7 @@ void SnakeGame::start() {
         drawScoreBoard();
         refresh();
         wrefresh(scoreBoard);
+        wrefresh(missionBoard);
 
         delay(100);
     }
