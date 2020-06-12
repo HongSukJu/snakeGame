@@ -9,12 +9,22 @@ void delay (unsigned int msecs) {
     clock_t goal = msecs*CLOCKS_PER_SEC/1000 + clock();
     while ( goal > clock() );
 }
+// terminal size를 세로 column, 가로 row 로 resize해줌. 
+void resizing(int column, int row) {
+    string cmd = "\e[8;";
+    string columnStr = to_string(column);
+    string rowStr = to_string(row);
+    cmd += columnStr + ";" + rowStr + "t;";
+    cout << cmd;
+}
 
 SnakeGame::SnakeGame():item_start(time(NULL)){
     height = 21; width = 50;
     boardHeight = (height) / 2; boardWidth = 25;
     score = 0;
     srand((unsigned int)time(NULL));
+
+    resizing(height + 2, width + boardWidth + 3);
 
     initWindow();
     initWalls();
@@ -331,16 +341,16 @@ void SnakeGame::drawScoreBoard() {
     mvwprintw(scoreBoard, 0, 1, "Score Board");
     mvwprintw(missionBoard, 0, 1, "Mission Board");
     string B = "B: ";
-    B.append(to_string(snake.length)).append(" / ").append(to_string(snake.maxLength));
+    B += to_string(snake.length) + " / " + to_string(snake.maxLength);
     mvwprintw(scoreBoard, boardHeight/3, 2, B.c_str());
     string plus = "+: ";
-    plus.append(to_string(snake.growthCnt));
+    plus += to_string(snake.growthCnt);
     mvwprintw(scoreBoard, boardHeight/3+1, 2, plus.c_str());
     string minus = "-: ";
-    minus.append(to_string(snake.poisonCnt));
+    minus += to_string(snake.poisonCnt);
     mvwprintw(scoreBoard, boardHeight/3+2, 2, minus.c_str());
     string G = "G: ";
-    G.append(to_string(snake.gateCnt));
+    G += to_string(snake.gateCnt);
     mvwprintw(scoreBoard, boardHeight/3+3, 2, G.c_str());
 }
 void SnakeGame::start() {

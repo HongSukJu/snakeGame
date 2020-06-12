@@ -1,4 +1,5 @@
 #include "snakeGame.h"
+#include <iostream>
 
 int main() {
     SnakeGame game;
