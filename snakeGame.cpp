@@ -216,7 +216,7 @@ void SnakeGame::moveSnake() {
     addch(' ');
     attroff(COLOR_PAIR(4));
 
-    if (!isEatGrowth() && !destination) {
+    if (!isEatGrowth()) {
         attron(COLOR_PAIR(1));
         move(snake.tail[snake.tail.size() - 1].y, snake.tail[snake.tail.size() - 1].x);
         addch(' ');
@@ -361,7 +361,7 @@ void SnakeGame::start() {
         if (checkCollision()) break;
 
         item_curr = time(NULL) - item_start; // 타이머 측정 
-        if (growthItems.size() + poisonItems.size() < 3){
+        if (growthItems.size() + poisonItems.size() < 3) {
             makeItems();
             item_start = time(NULL); // 타이머 초기화
 
