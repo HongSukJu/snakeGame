@@ -56,11 +56,13 @@ void SnakeGame::initWindow() {
     init_pair(5, COLOR_GREEN, COLOR_GREEN); // GrowthItem 색깔
     init_pair(6, COLOR_RED, COLOR_RED); // PosionItem 색깔
     init_pair(7, COLOR_BLUE, COLOR_BLUE); // gate department 색깔
+    init_pair(8, COLOR_WHITE, 240); // gameOverWindow 색깔
 
     scoreBoard = newwin(boardHeight, boardWidth, 1, width+2);
     missionBoard = newwin(boardHeight, boardWidth, 2+boardHeight, width+2);
     blockBoard = newwin(blockBoardHeight, blockBoardWidth, height + 2, 1);
     shortcutBoard = newwin(shortcutBoardHeight, shortcutBoardWidth, height + 2, blockBoardWidth + 2);
+    gameOverWindow = newwin(3, 19, 15, 17);
     box(scoreBoard, 0, 0);
     box(missionBoard, 0 ,0);
     box(blockBoard, 0, 0);
@@ -350,6 +352,7 @@ void SnakeGame::initBoard() {
     mvwprintw(missionBoard, 0, 1, "Mission Board");
     mvwprintw(blockBoard, 0, 1, "Block Board");
     mvwprintw(shortcutBoard, 0, 1, "Shortcut Board");
+    mvwprintw(gameOverWindow, 1, 2, "G a m e O v e r");
     wattron(blockBoard, COLOR_PAIR(2));
     mvwaddch(blockBoard, blockBoardHeight / 3, 4, ' ');
     wattroff(blockBoard, COLOR_PAIR(2));
@@ -396,8 +399,11 @@ void SnakeGame::start() {
     makeGate();
 
     while(true) {
-        if (snake.length < 3) break;
-        if (checkCollision()) break;
+        if (snake.length < 3 || checkCollision()) {
+            wbkgd(gameOverWindow, COLOR_PAIR(8));
+            wrefresh(gameOverWindow);
+            break;
+        }
 
         item_curr = time(NULL) - item_start; // 타이머 측정 
         if (growthItems.size() + poisonItems.size() < 3) {
