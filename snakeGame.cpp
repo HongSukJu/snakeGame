@@ -18,15 +18,19 @@ void resizing(int column, int row) {
     cout << cmd;
 }
 
-SnakeGame::SnakeGame():item_start(time(NULL)){
+SnakeGame::SnakeGame():item_start(time(NULL)) {
     height = 21; width = 50;
-    boardHeight = (height) / 2; boardWidth = 25;
+    boardHeight = height / 2; boardWidth = 25;
+    blockBoardHeight = 7; blockBoardWidth = width;
+    shortcutBoardHeight = blockBoardHeight; shortcutBoardWidth = boardWidth;
     score = 0;
     srand((unsigned int)time(NULL));
+    setlocale(LC_ALL, ""); // unicode 사용
 
-    resizing(height + 2, width + boardWidth + 3);
+    resizing(height + blockBoardHeight + 3, width + boardWidth + 3);
 
     initWindow();
+    initBoard();
     initWalls();
     drawWalls();
     initSnake();
@@ -55,8 +59,12 @@ void SnakeGame::initWindow() {
 
     scoreBoard = newwin(boardHeight, boardWidth, 1, width+2);
     missionBoard = newwin(boardHeight, boardWidth, 2+boardHeight, width+2);
+    blockBoard = newwin(blockBoardHeight, blockBoardWidth, height + 2, 1);
+    shortcutBoard = newwin(shortcutBoardHeight, shortcutBoardWidth, height + 2, blockBoardWidth + 2);
     box(scoreBoard, 0, 0);
     box(missionBoard, 0 ,0);
+    box(blockBoard, 0, 0);
+    box(shortcutBoard, 0, 0);
 }
 void SnakeGame::initWalls() {
     for (int i=1; i<=width; i++) {
@@ -337,9 +345,40 @@ void SnakeGame::makeGate() {
     addch(' ');
     attroff(COLOR_PAIR(7));
 }
-void SnakeGame::drawScoreBoard() {
+void SnakeGame::initBoard() {
     mvwprintw(scoreBoard, 0, 1, "Score Board");
     mvwprintw(missionBoard, 0, 1, "Mission Board");
+    mvwprintw(blockBoard, 0, 1, "Block Board");
+    mvwprintw(shortcutBoard, 0, 1, "Shortcut Board");
+    wattron(blockBoard, COLOR_PAIR(2));
+    mvwaddch(blockBoard, blockBoardHeight / 3, 4, ' ');
+    wattroff(blockBoard, COLOR_PAIR(2));
+    mvwprintw(blockBoard, blockBoardHeight / 3, 5, " : Wall");
+    wattron(blockBoard, COLOR_PAIR(3));
+    mvwaddch(blockBoard, blockBoardHeight / 3, 14, ' ');
+    wattroff(blockBoard, COLOR_PAIR(3));
+    mvwprintw(blockBoard, blockBoardHeight / 3, 15, " : Immune Wall");
+    wattron(blockBoard, COLOR_PAIR(4));
+    mvwaddch(blockBoard, blockBoardHeight / 3, 31, ' ');
+    wattroff(blockBoard, COLOR_PAIR(4));
+    mvwprintw(blockBoard, blockBoardHeight / 3, 32, " : User");
+    wattron(blockBoard, COLOR_PAIR(5));
+    mvwaddch(blockBoard, blockBoardHeight / 3 * 2, 4, ' ');
+    wattroff(blockBoard, COLOR_PAIR(5));
+    mvwprintw(blockBoard, blockBoardHeight / 3 * 2, 5, " : Growth Item");
+    wattron(blockBoard, COLOR_PAIR(6));
+    mvwaddch(blockBoard, blockBoardHeight / 3 * 2, 21, ' ');
+    wattroff(blockBoard, COLOR_PAIR(6));
+    mvwprintw(blockBoard, blockBoardHeight / 3 * 2, 22, " : Poison Item");
+    wattron(blockBoard, COLOR_PAIR(7));
+    mvwaddch(blockBoard, blockBoardHeight / 3 * 2, 38, ' ');
+    wattroff(blockBoard, COLOR_PAIR(7));
+    mvwprintw(blockBoard, blockBoardHeight / 3 * 2, 39, " : Gate");
+
+    mvwprintw(shortcutBoard, shortcutBoardHeight / 3, 2, "Move : \u2191 \u2193 \u2190 \u2192");
+    mvwprintw(shortcutBoard, shortcutBoardHeight / 3 * 2, 2, "Quit : q");
+}
+void SnakeGame::drawBoard() {
     string B = "B: ";
     B += to_string(snake.length) + " / " + to_string(snake.maxLength);
     mvwprintw(scoreBoard, boardHeight/3, 2, B.c_str());
@@ -364,16 +403,17 @@ void SnakeGame::start() {
         if (growthItems.size() + poisonItems.size() < 3) {
             makeItems();
             item_start = time(NULL); // 타이머 초기화
-
         }
         if (item_curr > 5){ // item 생성시간이 5초를 초과하면 아이템 재생성  
             removeItems();
         }
         moveSnake();
-        drawScoreBoard();
+        drawBoard();
         refresh();
         wrefresh(scoreBoard);
         wrefresh(missionBoard);
+        wrefresh(blockBoard);
+        wrefresh(shortcutBoard);
 
         delay(100);
     }
