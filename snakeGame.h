@@ -11,10 +11,10 @@ private:
     int boardHeight, boardWidth;
     int blockBoardHeight, blockBoardWidth;
     int shortcutBoardHeight, shortcutBoardWidth;
-    int score;
+    int score,level;
     std::vector<Position> growthItems;
     std::vector<Position> poisonItems;
-    std::vector<Wall> walls;
+    std::vector<Wall> walls,maps,map3,map4,stage;
     Snake snake;
     time_t item_start, item_curr;
     WINDOW *scoreBoard;
@@ -22,10 +22,16 @@ private:
     WINDOW *blockBoard;
     WINDOW *shortcutBoard;
     WINDOW *gameOverWindow;
+    //stage가 바뀔 떄 마다 다시 시작 기릿.
+    void restart();
     // window생성과 각종 필요한 설정을 해줌.
     void initWindow();
     // wall을 초기화해줌.
     void initWalls();
+    // level에 따라 맵을 그려준다.
+    void initMaps();
+    // 그린 맵으로 바꿔준다.
+    void changeMaps();
     // 최초 wall을 그려줌.
     void drawWalls();
     // snake를 초기화해줌.
@@ -53,6 +59,8 @@ private:
     void initBoard();
     // scoreBoard 새로고침.
     void drawBoard();
+    //mission 기릿.
+    void mission();
     
 public:
     SnakeGame();
