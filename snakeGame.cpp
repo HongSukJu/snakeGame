@@ -19,11 +19,14 @@ void resizing(int column, int row) {
 }
 
 SnakeGame::SnakeGame():item_start(time(NULL)) {
-    height = 21; width = 50;
+    level=1;
+    initMaps();
+    /*height = 21; width = 50;
     boardHeight = height / 2; boardWidth = 25;
     blockBoardHeight = 7; blockBoardWidth = width;
     shortcutBoardHeight = blockBoardHeight; shortcutBoardWidth = boardWidth;
     score = 0;
+    level=1;
     srand((unsigned int)time(NULL));
     setlocale(LC_ALL, ""); // unicode 사용
 
@@ -32,14 +35,34 @@ SnakeGame::SnakeGame():item_start(time(NULL)) {
     initWindow();
     initBoard();
     initWalls();
-    drawWalls();
+    initMaps();
+    //drawWalls();
     initSnake();
-    drawSnake();
+    drawSnake();*/
 }
 SnakeGame::~SnakeGame(){
     nodelay(stdscr, false);
     getch();
     endwin();
+}
+void SnakeGame::restart(){
+    boardHeight = height / 2; boardWidth = 25;
+    blockBoardHeight = 7; blockBoardWidth = width;
+    shortcutBoardHeight = blockBoardHeight; shortcutBoardWidth = boardWidth;
+    score = 0;
+    level=1;
+    srand((unsigned int)time(NULL));
+    setlocale(LC_ALL, ""); // unicode 사용
+
+    resizing(height + blockBoardHeight + 3, width + boardWidth + 3);
+
+    initWindow();
+    initBoard();
+    /*initWalls();
+    initMaps();
+    //drawWalls();
+    initSnake();
+    drawSnake();*/
 }
 void SnakeGame::initWindow() {
     initscr();
@@ -84,16 +107,95 @@ void SnakeGame::initWalls() {
         walls.push_back(Wall(i, width));
     }
 }
+void SnakeGame::initMaps(){
+    if(level==3){ //just pass it over
+        restart();
+        maps.assign(walls.begin(), walls.end());
+        changeMaps();
+    }
+    else if(level==2){ //+shape map
+        restart();
+        maps.assign(walls.begin(), walls.end());
+        for(int i=0;i<6;i++){
+            maps.push_back(Wall(8+i,25));
+        }
+        for(int i=0;i<15;i++){
+            maps.push_back(Wall(10,18+i));
+        }
+        changeMaps();
+    }
+    else if(level==1){ //30*75map
+        height=30; width=75;
+        restart();
+        walls.assign(0,Wall(0,0));
+        initWalls();
+        maps.assign(walls.begin(), walls.end());
+        for(int i=0;i<18;i++){
+            maps.push_back(Wall(7+i,7));
+            maps.push_back(Wall(7+i,32));
+            maps.push_back(Wall(7+i,43));
+            maps.push_back(Wall(7+i,68));
+        }
+        for(int i=0;i<25;i++){
+            maps.push_back(Wall(7,7+i));
+            maps.push_back(Wall(24,43+i));
+        }
+        changeMaps();
+    }
+    else if(level==4){ //40*100map miro
+        height=40; width=100;
+        restart();
+        walls.assign(0,Wall(0,0));
+        initWalls();
+        maps.assign(walls.begin(), walls.end());
+        for(int i=0;i<26;i++)
+            maps.push_back(Wall(8+i,8));
+        for(int i=0;i<37;i++)
+            maps.push_back(Wall(33,8+i));
+
+        for(int i=0;i<36;i++)
+            maps.push_back(Wall(29,17+i));
+        for(int i=0;i<18;i++)
+            maps.push_back(Wall(12+i,52));
+        for(int i=0;i<41;i++)
+            maps.push_back(Wall(12,52+i));
+
+        for(int i=0;i<34;i++){
+            maps.push_back(Wall(17,57+i));
+            maps.push_back(Wall(29,57+i));
+        }
+        for(int i=0;i<13;i++)
+            maps.push_back(Wall(17+i,90));
+
+        for(int i=0;i<13;i++)
+            maps.push_back(Wall(9,18+i));
+        for(int i=0;i<11;i++)
+            maps.push_back(Wall(9+i,30));
+        for(int i=0;i<15;i++)
+            maps.push_back(Wall(19,30+i));
+        for(int i=0;i<13;i++)
+            maps.push_back(Wall(7+i,44));
+        for(int i=0;i<18;i++)
+            maps.push_back(Wall(7,44+i));
+        changeMaps();
+    }
+}
+void SnakeGame::changeMaps(){
+    stage.assign(maps.begin(), maps.end());
+    drawWalls();
+    initSnake();
+    drawSnake();
+}
 void SnakeGame::drawWalls() {
-    for (int i=0; i<walls.size(); i++) {
-        if (!walls[i].immune) {
+    for (int i=0; i<stage.size(); i++) {
+        if (!stage[i].immune) {
             attron(COLOR_PAIR(2));
-            move(walls[i].pos.y, walls[i].pos.x);
+            move(stage[i].pos.y, stage[i].pos.x);
             addch(' ');
             attroff(COLOR_PAIR(2));
         } else {
             attron(COLOR_PAIR(3));
-            move(walls[i].pos.y, walls[i].pos.x);
+            move(stage[i].pos.y, stage[i].pos.x);
             addch(' ');
             attroff(COLOR_PAIR(3));
         }
@@ -102,7 +204,7 @@ void SnakeGame::drawWalls() {
 void SnakeGame::initSnake() {
     vector<Position> body;
     for (int i=0; i<3; i++) {
-        Position temp = Position(10, 40+i);
+        Position temp = Position(2, 30+i);
         body.push_back(temp);
     }
     snake = Snake(body);
@@ -144,8 +246,8 @@ bool SnakeGame::isEatPoison() {
 }
 // 포인터를 리턴한 이유로는 그냥 Wall을 리턴할경우 NULL이 리턴이안되네요 개같은.
 Wall* SnakeGame::isOnGate() {
-    auto iter = walls.begin();
-    for (; iter != walls.end(); iter++) {
+    auto iter = stage.begin();
+    for (; iter != stage.end(); iter++) {
         if (iter->gate && iter->pos.y == snake.head.y && iter->pos.x == snake.head.x) {
             snake.gateCnt++;
             return iter->destination;
@@ -247,8 +349,8 @@ bool SnakeGame::checkCollision() {
         return true;
 
     // head가 벽에 닿았는지 체크
-    for (int i=0; i<walls.size(); i++) {
-        if (!walls[i].gate && snake.head.y == walls[i].pos.y && snake.head.x == walls[i].pos.x) {
+    for (int i=0; i<stage.size(); i++) {
+        if (!stage[i].gate && snake.head.y == stage[i].pos.y && snake.head.x == stage[i].pos.x) {
             return true;
         }
     }
@@ -327,23 +429,23 @@ void SnakeGame::removeItems(){
 }
 
 void SnakeGame::makeGate() {
-    int idx = rand() % walls.size();
-    while (walls[idx].immune)
-        idx = rand() % walls.size();
+    int idx = rand() % stage.size();
+    while (stage[idx].immune)
+        idx = rand() % stage.size();
 
-    int destinationIdx = rand() % walls.size();
-    while (walls[destinationIdx].immune || idx == destinationIdx)
-        destinationIdx = rand() % walls.size();
+    int destinationIdx = rand() % stage.size();
+    while (stage[destinationIdx].immune || idx == destinationIdx)
+        destinationIdx = rand() % stage.size();
 
-    walls[idx].gate = true;
-    walls[destinationIdx].gate = true;
-    walls[idx].destination = &walls[destinationIdx];
-    walls[destinationIdx].destination = &walls[idx];
+    stage[idx].gate = true;
+    stage[destinationIdx].gate = true;
+    stage[idx].destination = &stage[destinationIdx];
+    stage[destinationIdx].destination = &stage[idx];
 
     attron(COLOR_PAIR(7));
-    move(walls[idx].pos.y, walls[idx].pos.x);
+    move(stage[idx].pos.y, stage[idx].pos.x);
     addch(' ');
-    move(walls[destinationIdx].pos.y, walls[destinationIdx].pos.x);
+    move(stage[destinationIdx].pos.y, stage[destinationIdx].pos.x);
     addch(' ');
     attroff(COLOR_PAIR(7));
 }
