@@ -21,24 +21,6 @@ void resizing(int column, int row) {
 SnakeGame::SnakeGame():item_start(time(NULL)) {
     level=1;
     initMaps();
-    /*height = 21; width = 50;
-    boardHeight = height / 2; boardWidth = 25;
-    blockBoardHeight = 7; blockBoardWidth = width;
-    shortcutBoardHeight = blockBoardHeight; shortcutBoardWidth = boardWidth;
-    score = 0;
-    level=1;
-    srand((unsigned int)time(NULL));
-    setlocale(LC_ALL, ""); // unicode 사용
-
-    resizing(height + blockBoardHeight + 3, width + boardWidth + 3);
-
-    initWindow();
-    initBoard();
-    initWalls();
-    initMaps();
-    //drawWalls();
-    initSnake();
-    drawSnake();*/
 }
 SnakeGame::~SnakeGame(){
     nodelay(stdscr, false);
@@ -50,7 +32,6 @@ void SnakeGame::restart(){
     blockBoardHeight = 7; blockBoardWidth = width;
     shortcutBoardHeight = blockBoardHeight; shortcutBoardWidth = boardWidth;
     score = 0;
-    level=1;
     srand((unsigned int)time(NULL));
     setlocale(LC_ALL, ""); // unicode 사용
 
@@ -58,11 +39,6 @@ void SnakeGame::restart(){
 
     initWindow();
     initBoard();
-    /*initWalls();
-    initMaps();
-    //drawWalls();
-    initSnake();
-    drawSnake();*/
 }
 void SnakeGame::initWindow() {
     initscr();
@@ -108,13 +84,19 @@ void SnakeGame::initWalls() {
     }
 }
 void SnakeGame::initMaps(){
-    if(level==3){ //just pass it over
+    if(level==1){ //just pass it over
+        height=21; width=50;
         restart();
+        initWalls();
         maps.assign(walls.begin(), walls.end());
         changeMaps();
     }
     else if(level==2){ //+shape map
+        erase();
+        height=21; width=50;
         restart();
+        walls.assign(0,Wall(0,0));
+        initWalls();
         maps.assign(walls.begin(), walls.end());
         for(int i=0;i<6;i++){
             maps.push_back(Wall(8+i,25));
@@ -124,7 +106,8 @@ void SnakeGame::initMaps(){
         }
         changeMaps();
     }
-    else if(level==1){ //30*75map
+    else if(level==3){ //30*75map
+        erase();
         height=30; width=75;
         restart();
         walls.assign(0,Wall(0,0));
@@ -143,6 +126,7 @@ void SnakeGame::initMaps(){
         changeMaps();
     }
     else if(level==4){ //40*100map miro
+        erase();
         height=40; width=100;
         restart();
         walls.assign(0,Wall(0,0));
@@ -496,6 +480,25 @@ void SnakeGame::drawBoard() {
     string G = "G: ";
     G += to_string(snake.gateCnt);
     mvwprintw(scoreBoard, boardHeight/3+3, 2, G.c_str());
+
+    //missionBoard
+    string L="L: ";
+    L+=to_string(level);
+    mvwprintw(missionBoard, boardHeight/3, 2, L.c_str());
+    string M="M: ";
+    M+=to_string(snake.length)+" / 4";
+    mvwprintw(missionBoard, boardHeight/3+1, 2, M.c_str());
+}
+void SnakeGame::mission(){
+    if(level==1){
+        if(snake.length==4){level=2; initMaps(); makeGate(); removeItems();}
+    }else if(level==2){
+        if(snake.length==4){level=3; initMaps(); makeGate(); removeItems();}
+    }else if(level==3){
+        if(snake.length==4){level=4; initMaps(); makeGate(); removeItems();}
+    }else if(level==4){
+        if(snake.length==4){level=5; initMaps(); makeGate(); removeItems();}
+    }
 }
 void SnakeGame::start() {
     makeGate();
@@ -515,6 +518,7 @@ void SnakeGame::start() {
         if (item_curr > 5){ // item 생성시간이 5초를 초과하면 아이템 재생성  
             removeItems();
         }
+        mission();
         moveSnake();
         drawBoard();
         refresh();
