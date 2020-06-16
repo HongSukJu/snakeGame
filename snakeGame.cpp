@@ -104,7 +104,7 @@ void SnakeGame::initMaps(){
         for(int i=0;i<15;i++){
             maps.push_back(Wall(10,18+i));
         }
-        maps.push_back(Wall(10,25,true);
+        maps.push_back(Wall(10,25,true));
         changeMaps();
     }
     else if(level==3){ //30*75map
