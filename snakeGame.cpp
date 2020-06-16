@@ -507,7 +507,7 @@ void SnakeGame::mission(){
     }else if(level==3){
         if(snake.length==4){level=4; initMaps(); makeGate(); removeItems();}
     }else if(level==4){
-        if(snake.length==4){level=5; initMaps(); makeGate(); removeItems();}
+        //if(snake.length==4){level=5; initMaps(); makeGate(); removeItems();}
     }
 }
 void SnakeGame::start() {
