@@ -35,7 +35,7 @@ void SnakeGame::restart(){
     srand((unsigned int)time(NULL));
     setlocale(LC_ALL, ""); // unicode 사용
 
-    resizing(height + blockBoardHeight + 3, width + boardWidth + 3);
+    resizing(40 + blockBoardHeight + 3, 100 + boardWidth + 3);
 
     initWindow();
     initBoard();
@@ -104,6 +104,7 @@ void SnakeGame::initMaps(){
         for(int i=0;i<15;i++){
             maps.push_back(Wall(10,18+i));
         }
+        maps.push_back(Wall(10,25,true);
         changeMaps();
     }
     else if(level==3){ //30*75map
@@ -497,7 +498,7 @@ void SnakeGame::mission(){
     }else if(level==3){
         if(snake.length==4){level=4; initMaps(); makeGate(); removeItems();}
     }else if(level==4){
-        if(snake.length==4){level=5; initMaps(); makeGate(); removeItems();}
+        //if(snake.length==4){level=5; initMaps(); makeGate(); removeItems();}
     }
 }
 void SnakeGame::start() {
