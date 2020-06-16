@@ -99,9 +99,11 @@ void SnakeGame::initMaps(){
         initWalls();
         maps.assign(walls.begin(), walls.end());
         for(int i=0;i<6;i++){
+            if(8+i==10) continue;
             maps.push_back(Wall(8+i,25));
         }
         for(int i=0;i<15;i++){
+            if(18+i==25) continue;
             maps.push_back(Wall(10,18+i));
         }
         maps.push_back(Wall(10,25,true));
@@ -358,6 +360,13 @@ void SnakeGame::makeItems() {
         Gy = rand() % (height - 2) + 2;
         Gx = rand() % (width - 2) + 2;
 
+        for(int i=0;i<stage.size();i++){
+            if(Gy==stage[i].pos.y&&Gx==stage[i].pos.x){
+                check=false;
+                break;
+            }
+        }
+
         for (int i = 0; i < snake.length; i ++) {
             if (i == 0) {
                 if (snake.head.y == Gy && snake.head.x == Gx) {
@@ -498,7 +507,7 @@ void SnakeGame::mission(){
     }else if(level==3){
         if(snake.length==4){level=4; initMaps(); makeGate(); removeItems();}
     }else if(level==4){
-        //if(snake.length==4){level=5; initMaps(); makeGate(); removeItems();}
+        if(snake.length==4){level=5; initMaps(); makeGate(); removeItems();}
     }
 }
 void SnakeGame::start() {
