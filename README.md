@@ -7,3 +7,8 @@ C++ Programming Team Assignment
 * 20193398 홍석주
 ## Reference
 <https://github.com/romanedgn/snake-game>
+## How to execute
+```
+make
+./game
+```
