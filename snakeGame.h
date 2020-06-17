@@ -11,7 +11,7 @@ private:
     int boardHeight, boardWidth;
     int blockBoardHeight, blockBoardWidth;
     int shortcutBoardHeight, shortcutBoardWidth;
-    int score;
+    int score, level;
     std::vector<Position> growthItems;
     std::vector<Position> poisonItems;
     std::vector<Wall> walls;
@@ -53,6 +53,10 @@ private:
     void initBoard();
     // scoreBoard 새로고침.
     void drawBoard();
+    // mission
+    bool isClear();
+    void nextMap();
+    void clearGameBoard();
     
 public:
     SnakeGame();

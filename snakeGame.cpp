@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <ctime>
 #include <time.h>
 #include "snakeGame.h"
@@ -23,7 +24,7 @@ SnakeGame::SnakeGame():item_start(time(NULL)) {
     boardHeight = height / 2; boardWidth = 25;
     blockBoardHeight = 7; blockBoardWidth = width;
     shortcutBoardHeight = blockBoardHeight; shortcutBoardWidth = boardWidth;
-    score = 0;
+    score = 0, level = 1;
     srand((unsigned int)time(NULL));
     setlocale(LC_ALL, ""); // unicode 사용
 
@@ -35,6 +36,7 @@ SnakeGame::SnakeGame():item_start(time(NULL)) {
     drawWalls();
     initSnake();
     drawSnake();
+    makeGate();
 }
 SnakeGame::~SnakeGame(){
     nodelay(stdscr, false);
@@ -69,20 +71,24 @@ void SnakeGame::initWindow() {
     box(shortcutBoard, 0, 0);
 }
 void SnakeGame::initWalls() {
-    for (int i=1; i<=width; i++) {
-        if (i == 1 || i == width) walls.push_back(Wall(1, i, true));
-        else walls.push_back(Wall(1, i));
+    ifstream readFile;
+    readFile.open("map/" + to_string(level));
+
+    if (readFile.is_open()) {
+        int line = 1;
+        while (!readFile.eof()) {
+            string temp;
+            getline(readFile, temp);
+
+            for (int i=0; i<temp.size(); i++) {
+                if (temp[i] == '1') walls.push_back(Wall(line, i+1));
+                else if (temp[i] == '2') walls.push_back(Wall(line, i+1, true));
+            }
+            line++;
+        }
     }
-    for (int i=1; i<=width; i++) {
-        if (i == 1 || i == width) walls.push_back(Wall(height, i, true));
-        else walls.push_back(Wall(height, i));
-    }
-    for (int i=2; i<height; i++) {
-        walls.push_back(Wall(i, 1));
-    }
-    for (int i=2; i<height; i++) {
-        walls.push_back(Wall(i, width));
-    }
+
+    readFile.close();
 }
 void SnakeGame::drawWalls() {
     for (int i=0; i<walls.size(); i++) {
@@ -285,6 +291,13 @@ void SnakeGame::makeItems() {
                 }
             }
         }
+
+        for (int i=0; i<walls.size(); i++) {
+            if (walls[i].pos.y == Gy && walls[i].pos.x == Gx) {
+                check = false;
+                break;
+            }
+        }
     }
 
     Position temp = Position(Gy, Gx);
@@ -395,9 +408,40 @@ void SnakeGame::drawBoard() {
     G += to_string(snake.gateCnt);
     mvwprintw(scoreBoard, boardHeight/3+3, 2, G.c_str());
 }
-void SnakeGame::start() {
+bool SnakeGame::isClear() {
+    if (level == 1 && snake.length > 3) {
+        return true;
+    } else if (level == 2 && snake.length > 3) {
+        return true;
+    } else if (level == 3 && snake.length > 3) {
+        return true;
+    }
+    
+    return false;
+}
+void SnakeGame::nextMap() {
+    level++;
+    clearGameBoard();
+    initWalls();
+    drawWalls();
+    initSnake();
+    drawSnake();
     makeGate();
-
+}
+void SnakeGame::clearGameBoard() {
+    attron(COLOR_PAIR(1));
+    for (int i=0; i<height; i++) {
+        for (int j=0; j<width; j++) {
+            move(i+1, j+1);
+            addch(' ');
+        }
+    }
+    attroff(COLOR_PAIR(1));
+    growthItems.clear();
+    poisonItems.clear();
+    walls.clear();
+}
+void SnakeGame::start() {
     while(true) {
         if (snake.length < 3 || checkCollision()) {
             wbkgd(gameOverWindow, COLOR_PAIR(8));
@@ -413,6 +457,12 @@ void SnakeGame::start() {
         if (item_curr > 5){ // item 생성시간이 5초를 초과하면 아이템 재생성  
             removeItems();
         }
+
+        if (isClear()) {
+            nextMap();
+            continue;
+        }
+
         moveSnake();
         drawBoard();
         refresh();
