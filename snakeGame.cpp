@@ -64,6 +64,7 @@ void SnakeGame::initWindow() {
     blockBoard = newwin(blockBoardHeight, blockBoardWidth, height + 2, 1);
     levelBoard = newwin(levelBoardHeight, levelBoardWidth, height + 2, blockBoardWidth + 2);
     gameOverWindow = newwin(3, 19, 15, 17);
+    victoryWindow = newwin(3, 19, 15, 17);
     box(scoreBoard, 0, 0);
     box(missionBoard, 0 ,0);
     box(blockBoard, 0, 0);
@@ -363,6 +364,7 @@ void SnakeGame::initBoard() {
     mvwprintw(missionBoard, 0, 1, "Mission Board");
     mvwprintw(blockBoard, 0, 1, "Block Board");
     mvwprintw(gameOverWindow, 1, 2, "G a m e O v e r");
+    mvwprintw(victoryWindow, 1, 2, "Y O U W I N ! !");
     wattron(blockBoard, COLOR_PAIR(2));
     mvwaddch(blockBoard, blockBoardHeight / 3, 4, ' ');
     wattroff(blockBoard, COLOR_PAIR(2));
@@ -449,18 +451,28 @@ bool SnakeGame::isClear() {
         snake.gateCnt >= 1
     ) {
         return true;
+    } else if (
+        level == 4 &&
+        snake.length >= 10 &&
+        snake.growthCnt >= 5 &&
+        snake.poisonCnt >= 2 &&
+        snake.gateCnt >= 1
+    ) {
+        return true;
     }
     
     return false;
 }
 void SnakeGame::nextMap() {
-    level++;
-    clearGameBoard();
-    initWalls();
-    drawWalls();
-    initSnake();
-    drawSnake();
-    makeGate();
+    if (level < 4) {
+        level++;
+        clearGameBoard();
+        initWalls();
+        drawWalls();
+        initSnake();
+        drawSnake();
+        makeGate();
+    }
 }
 void SnakeGame::clearGameBoard() {
     attron(COLOR_PAIR(1));
@@ -511,8 +523,15 @@ void SnakeGame::start() {
         }
 
         if (isClear()) {
-            nextMap();
-            continue;
+            if (level == 4) {
+                wbkgd(victoryWindow, COLOR_PAIR(8));
+                wrefresh(victoryWindow);
+                break;
+            }
+            else {
+                nextMap();
+                continue;
+            }
         }
 
         moveSnake();
