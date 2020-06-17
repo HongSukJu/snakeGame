@@ -23,10 +23,9 @@ SnakeGame::SnakeGame():item_start(time(NULL)) {
     height = 21; width = 50;
     boardHeight = height / 2; boardWidth = 25;
     blockBoardHeight = 7; blockBoardWidth = width;
-    shortcutBoardHeight = blockBoardHeight; shortcutBoardWidth = boardWidth;
+    levelBoardHeight = blockBoardHeight; levelBoardWidth = boardWidth;
     score = 0, level = 1;
     srand((unsigned int)time(NULL));
-    setlocale(LC_ALL, ""); // unicode 사용
 
     resizing(height + blockBoardHeight + 3, width + boardWidth + 3);
 
@@ -63,12 +62,12 @@ void SnakeGame::initWindow() {
     scoreBoard = newwin(boardHeight, boardWidth, 1, width+2);
     missionBoard = newwin(boardHeight, boardWidth, 2+boardHeight, width+2);
     blockBoard = newwin(blockBoardHeight, blockBoardWidth, height + 2, 1);
-    shortcutBoard = newwin(shortcutBoardHeight, shortcutBoardWidth, height + 2, blockBoardWidth + 2);
+    levelBoard = newwin(levelBoardHeight, levelBoardWidth, height + 2, blockBoardWidth + 2);
     gameOverWindow = newwin(3, 19, 15, 17);
     box(scoreBoard, 0, 0);
     box(missionBoard, 0 ,0);
     box(blockBoard, 0, 0);
-    box(shortcutBoard, 0, 0);
+    box(levelBoard, 0, 0);
 }
 void SnakeGame::initWalls() {
     ifstream readFile;
@@ -320,7 +319,6 @@ void SnakeGame::makeItems() {
 }
 
 void SnakeGame::removeItems(){
-
     vector<Position>::iterator iter;
     for (iter = growthItems.begin(); iter < growthItems.end(); ++iter) { // GrowthItem에 있는 Position정보들 모두 배경색으로 칠하기.
         attron(COLOR_PAIR(1));
@@ -364,7 +362,7 @@ void SnakeGame::initBoard() {
     mvwprintw(scoreBoard, 0, 1, "Score Board");
     mvwprintw(missionBoard, 0, 1, "Mission Board");
     mvwprintw(blockBoard, 0, 1, "Block Board");
-    mvwprintw(shortcutBoard, 0, 1, "Shortcut Board");
+    mvwprintw(levelBoard, 0, 1, "level Board");
     mvwprintw(gameOverWindow, 1, 2, "G a m e O v e r");
     wattron(blockBoard, COLOR_PAIR(2));
     mvwaddch(blockBoard, blockBoardHeight / 3, 4, ' ');
@@ -390,9 +388,6 @@ void SnakeGame::initBoard() {
     mvwaddch(blockBoard, blockBoardHeight / 3 * 2, 38, ' ');
     wattroff(blockBoard, COLOR_PAIR(7));
     mvwprintw(blockBoard, blockBoardHeight / 3 * 2, 39, " : Gate");
-
-    mvwprintw(shortcutBoard, shortcutBoardHeight / 3, 2, "Move : \u2191 \u2193 \u2190 \u2192");
-    mvwprintw(shortcutBoard, shortcutBoardHeight / 3 * 2, 2, "Quit : q");
 }
 void SnakeGame::drawBoard() {
     string B = "B: ";
@@ -407,6 +402,13 @@ void SnakeGame::drawBoard() {
     string G = "G: ";
     G += to_string(snake.gateCnt);
     mvwprintw(scoreBoard, boardHeight/3+3, 2, G.c_str());
+
+    string L = "Level: ";
+    L += to_string(level);
+    mvwprintw(levelBoard, levelBoardHeight / 3, 2, L.c_str());
+    string S = "Score: ";
+    S += to_string(score);
+    mvwprintw(levelBoard, levelBoardHeight / 3 * 2, 2, S.c_str());
 }
 bool SnakeGame::isClear() {
     if (level == 1 && snake.length > 3) {
@@ -469,7 +471,7 @@ void SnakeGame::start() {
         wrefresh(scoreBoard);
         wrefresh(missionBoard);
         wrefresh(blockBoard);
-        wrefresh(shortcutBoard);
+        wrefresh(levelBoard);
 
         delay(100);
     }

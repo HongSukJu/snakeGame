@@ -10,7 +10,7 @@ private:
     int height, width;
     int boardHeight, boardWidth;
     int blockBoardHeight, blockBoardWidth;
-    int shortcutBoardHeight, shortcutBoardWidth;
+    int levelBoardHeight, levelBoardWidth;
     int score, level;
     std::vector<Position> growthItems;
     std::vector<Position> poisonItems;
@@ -20,7 +20,7 @@ private:
     WINDOW *scoreBoard;
     WINDOW *missionBoard;
     WINDOW *blockBoard;
-    WINDOW *shortcutBoard;
+    WINDOW *levelBoard;
     WINDOW *gameOverWindow;
     // window생성과 각종 필요한 설정을 해줌.
     void initWindow();
@@ -53,9 +53,11 @@ private:
     void initBoard();
     // scoreBoard 새로고침.
     void drawBoard();
-    // mission
+    // mission을 Clear했는지.
     bool isClear();
+    // 다음 맵으로 이동.
     void nextMap();
+    // Game Board 지우기.
     void clearGameBoard();
     
 public:
