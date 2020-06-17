@@ -22,6 +22,7 @@ private:
     WINDOW *blockBoard;
     WINDOW *levelBoard;
     WINDOW *gameOverWindow;
+    WINDOW *victoryWindow;
     // window생성과 각종 필요한 설정을 해줌.
     void initWindow();
     // wall을 초기화해줌.
