@@ -107,7 +107,7 @@ void SnakeGame::drawWalls() {
 void SnakeGame::initSnake() {
     vector<Position> body;
     for (int i=0; i<3; i++) {
-        Position temp = Position(10, 40+i);
+        Position temp = Position(4, 40+i);
         body.push_back(temp);
     }
     snake = Snake(body);
@@ -362,7 +362,6 @@ void SnakeGame::initBoard() {
     mvwprintw(scoreBoard, 0, 1, "Score Board");
     mvwprintw(missionBoard, 0, 1, "Mission Board");
     mvwprintw(blockBoard, 0, 1, "Block Board");
-    mvwprintw(levelBoard, 0, 1, "level Board");
     mvwprintw(gameOverWindow, 1, 2, "G a m e O v e r");
     wattron(blockBoard, COLOR_PAIR(2));
     mvwaddch(blockBoard, blockBoardHeight / 3, 4, ' ');
@@ -390,6 +389,7 @@ void SnakeGame::initBoard() {
     mvwprintw(blockBoard, blockBoardHeight / 3 * 2, 39, " : Gate");
 }
 void SnakeGame::drawBoard() {
+    clearDrawBoard();
     string B = "B: ";
     B += to_string(snake.length) + " / " + to_string(snake.maxLength);
     mvwprintw(scoreBoard, boardHeight/3, 2, B.c_str());
@@ -403,19 +403,51 @@ void SnakeGame::drawBoard() {
     G += to_string(snake.gateCnt);
     mvwprintw(scoreBoard, boardHeight/3+3, 2, G.c_str());
 
-    string L = "Level: ";
-    L += to_string(level);
-    mvwprintw(levelBoard, levelBoardHeight / 3, 2, L.c_str());
-    string S = "Score: ";
-    S += to_string(score);
-    mvwprintw(levelBoard, levelBoardHeight / 3 * 2, 2, S.c_str());
+    mvwprintw(levelBoard, levelBoardHeight/2-1, levelBoardWidth/2-3, "Level");
+    mvwprintw(levelBoard, levelBoardHeight/2+1, levelBoardWidth/2-1, to_string(level).c_str());
+
+    //missionBoard
+    string BM = "B: ";
+    if (snake.length >= 10) BM += to_string(snake.length) + " / 10 (v)";
+    else BM += to_string(snake.length) + " / 10 ()";
+    mvwprintw(missionBoard, boardHeight/3, 2, BM.c_str());
+    string plusM = "+: ";
+    if (snake.growthCnt >= 5) plusM += to_string(snake.growthCnt) + " / 5 (v)";
+    else plusM += to_string(snake.growthCnt) + " / 5 ()";
+    mvwprintw(missionBoard, boardHeight/3+1, 2, plusM.c_str());
+    string minusM = "-: ";
+    if (snake.poisonCnt >= 2) minusM += to_string(snake.poisonCnt) + " / 2 (v)";
+    else minusM += to_string(snake.poisonCnt) + " / 2 ()";
+    mvwprintw(missionBoard, boardHeight/3+2, 2, minusM.c_str());
+    string GM = "G: ";
+    if (snake.gateCnt >= 1) GM += to_string(snake.gateCnt) + " / 1 (v)";
+    else GM += to_string(snake.gateCnt) + " / 1 ()";
+    mvwprintw(missionBoard, boardHeight/3+3, 2, GM.c_str());
 }
 bool SnakeGame::isClear() {
-    if (level == 1 && snake.length > 3) {
+    if (
+        level == 1 &&
+        snake.length >= 10 &&
+        snake.growthCnt >= 5 &&
+        snake.poisonCnt >= 2 &&
+        snake.gateCnt >= 1
+    ) {
         return true;
-    } else if (level == 2 && snake.length > 3) {
+    } else if (
+        level == 2 &&
+        snake.length >= 10 &&
+        snake.growthCnt >= 5 &&
+        snake.poisonCnt >= 2 &&
+        snake.gateCnt >= 1
+    ) {
         return true;
-    } else if (level == 3 && snake.length > 3) {
+    } else if (
+        level == 3 &&
+        snake.length >= 10 &&
+        snake.growthCnt >= 5 &&
+        snake.poisonCnt >= 2 &&
+        snake.gateCnt >= 1
+    ) {
         return true;
     }
     
@@ -443,6 +475,24 @@ void SnakeGame::clearGameBoard() {
     poisonItems.clear();
     walls.clear();
 }
+void SnakeGame::clearDrawBoard() {
+    attron(COLOR_PAIR(1));
+    for (int i=1; i<boardHeight-1; i++) {
+        for (int j=1; j<boardWidth-1; j++) {
+            wmove(scoreBoard, i, j);
+            wmove(missionBoard, i, j);
+            waddch(scoreBoard, ' ');
+            waddch(missionBoard, ' ');
+        }
+    }
+    for (int i=1; i<levelBoardHeight-1; i++) {
+        for (int j=1; j<levelBoardWidth-1; j++) {
+            wmove(levelBoard, i, j);
+            waddch(levelBoard, ' ');
+        }
+    }
+    attroff(COLOR_PAIR(1));
+}
 void SnakeGame::start() {
     while(true) {
         if (snake.length < 3 || checkCollision()) {
@@ -456,7 +506,7 @@ void SnakeGame::start() {
             makeItems();
             item_start = time(NULL); // 타이머 초기화
         }
-        if (item_curr > 5){ // item 생성시간이 5초를 초과하면 아이템 재생성  
+        if (item_curr > 5) { // item 생성시간이 5초를 초과하면 아이템 재생성  
             removeItems();
         }
 

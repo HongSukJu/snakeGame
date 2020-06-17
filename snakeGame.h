@@ -59,6 +59,7 @@ private:
     void nextMap();
     // Game Board 지우기.
     void clearGameBoard();
+    void clearDrawBoard();
     
 public:
     SnakeGame();
